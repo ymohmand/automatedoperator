@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Never miss another call - BuildSimpleFast</title>
+<meta name="description" content="The AI receptionist for service businesses. Catches every call, books appointments, and texts you a summary - 24/7, for less than the cost of a part-time hire." />
+<meta name="robots" content="noindex,nofollow" />
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --bg-soft: #111114;
+    --card: #14151a;
+    --border: #23252d;
+    --border-soft: #1b1d24;
+    --text: #ececf1;
+    --text-dim: #9a9ba6;
+    --text-faint: #6b6c77;
+    --accent: #3b82f6;
+    --accent-bright: #60a5fa;
+    --accent-soft: rgba(59, 130, 246, 0.12);
+    --good: #4ade80;
+    --bad: #f87171;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --maxw: 980px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--accent-bright); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  .glow {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+  }
+  .glow::before {
+    content: ""; position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 600px;
+    background: radial-gradient(closest-side, rgba(59,130,246,0.18), rgba(59,130,246,0) 70%);
+    filter: blur(20px);
+  }
+  /* HEADER */
+  header.site {
+    position: relative; z-index: 1;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  header.site .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-weight: 600; letter-spacing: -0.01em; color: var(--text);
+  }
+  .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 14px var(--accent);
+  }
+  .pill {
+    font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-bright); background: var(--accent-soft);
+    padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(96,165,250,0.25);
+  }
+  /* HERO */
+  section.hero { position: relative; padding: 84px 0 56px; overflow: hidden; }
+  .eyebrow {
+    color: var(--accent-bright); font-size: 13px; letter-spacing: 0.14em;
+    text-transform: uppercase; margin-bottom: 18px; font-weight: 600;
+  }
+  h1 {
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.08; letter-spacing: -0.02em; margin: 0 0 22px;
+    font-weight: 700; color: var(--text);
+  }
+  h1 .name, h1 .company { color: var(--accent-bright); }
+  .sub {
+    font-size: clamp(17px, 1.6vw, 19px); color: var(--text-dim);
+    max-width: 720px; margin: 0 0 36px;
+  }
+  /* LOOM */
+  .video {
+    position: relative; aspect-ratio: 16 / 9; width: 100%;
+    border-radius: var(--radius); overflow: hidden;
+    background: #0e0f13; border: 1px solid var(--border);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(96,165,250,0.06);
+  }
+  .video iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .video .placeholder {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 14px; color: var(--text-dim);
+    background:
+      radial-gradient(circle at 30% 20%, rgba(59,130,246,0.10), transparent 40%),
+      radial-gradient(circle at 70% 80%, rgba(96,165,250,0.08), transparent 40%),
+      #0e0f13;
+  }
+  .video .placeholder .play {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--accent); display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 40px rgba(59,130,246,0.45);
+  }
+  .video .placeholder .play::after {
+    content: ""; width: 0; height: 0;
+    border-top: 12px solid transparent; border-bottom: 12px solid transparent;
+    border-left: 18px solid #fff; margin-left: 4px;
+  }
+  /* SECTIONS */
+  section { padding: 64px 0; position: relative; }
+  section + section { border-top: 1px solid var(--border-soft); }
+  h2 {
+    font-size: clamp(26px, 3vw, 34px); line-height: 1.15; letter-spacing: -0.015em;
+    margin: 0 0 16px; font-weight: 700;
+  }
+  h2 .accent { color: var(--accent-bright); }
+  .lead {
+    color: var(--text-dim); font-size: 18px; max-width: 720px; margin: 0 0 36px;
+  }
+  /* COST MATH */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  }
+  .col {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px;
+  }
+  .col.bad { border-color: rgba(248,113,113,0.25); }
+  .col.good { border-color: rgba(96,165,250,0.35); background: linear-gradient(180deg, rgba(59,130,246,0.06), var(--card) 70%); }
+  .col h3 { margin: 0 0 4px; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; }
+  .col .big { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; margin: 6px 0 16px; }
+  .col.bad .big { color: var(--bad); }
+  .col.good .big { color: var(--accent-bright); }
+  .col ul { margin: 0; padding: 0; list-style: none; }
+  .col li {
+    padding: 10px 0; border-top: 1px dashed var(--border);
+    color: var(--text-dim); font-size: 15px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .col li:first-child { border-top: 0; }
+  .col li .mark { flex: none; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; margin-top: 3px; }
+  .col.bad li .mark { background: rgba(248,113,113,0.12); color: var(--bad); }
+  .col.good li .mark { background: rgba(96,165,250,0.15); color: var(--accent-bright); }
+  .footnote { font-size: 13px; color: var(--text-faint); margin-top: 18px; }
+  /* WHAT'S INSIDE */
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .feat {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+  }
+  .feat .ico {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--accent-soft); display: flex; align-items: center; justify-content: center;
+    color: var(--accent-bright); font-weight: 700; margin-bottom: 14px;
+    border: 1px solid rgba(96,165,250,0.25);
+  }
+  .feat h4 { margin: 0 0 6px; font-size: 17px; }
+  .feat p { margin: 0; color: var(--text-dim); font-size: 15px; }
+  /* DOWNLOAD */
+  .download {
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    background: linear-gradient(180deg, rgba(59,130,246,0.06), var(--card) 80%);
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 28px;
+  }
+  .download .meta .label { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-bright); margin-bottom: 6px; }
+  .download .meta h3 { margin: 0 0 4px; font-size: 20px; }
+  .download .meta p { margin: 0; color: var(--text-dim); font-size: 15px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: #fff; font-weight: 600; font-size: 16px;
+    padding: 14px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer; transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+    box-shadow: 0 10px 24px rgba(59,130,246,0.35);
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--accent-bright); transform: translateY(-1px); text-decoration: none; }
+  .btn.ghost {
+    background: transparent; color: var(--text); border: 1px solid var(--border);
+    box-shadow: none;
+  }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent-bright); }
+  /* CTA */
+  section.cta { padding: 84px 0 96px; text-align: center; position: relative; overflow: hidden; }
+  section.cta .glow::before { top: 50%; transform: translate(-50%, -50%); opacity: 0.8; }
+  section.cta .inner { position: relative; z-index: 1; }
+  section.cta h2 { font-size: clamp(28px, 4vw, 42px); }
+  section.cta .lead { margin-left: auto; margin-right: auto; }
+  .cta-actions {
+    display: inline-flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+  }
+  .reply-hint {
+    margin-top: 22px; color: var(--text-faint); font-size: 14px;
+  }
+  .kbd {
+    display: inline-block; padding: 2px 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px; color: var(--accent-bright); background: var(--accent-soft);
+    border: 1px solid rgba(96,165,250,0.25); border-radius: 6px;
+  }
+  /* FOOTER */
+  footer.site {
+    border-top: 1px solid var(--border-soft); padding: 28px 0; color: var(--text-faint); font-size: 14px;
+  }
+  footer.site .wrap { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  /* RESPONSIVE */
+  @media (max-width: 760px) {
+    .compare { grid-template-columns: 1fr; }
+    .grid3 { grid-template-columns: 1fr; }
+    .download { flex-direction: column; align-items: flex-start; }
+    section { padding: 48px 0; }
+    section.hero { padding: 56px 0 40px; }
+    section.cta { padding: 64px 0; }
+  }
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header class="site">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>Automated Operator</div>
+    <span class="pill">For service business owners</span>
+  </div>
+</header>
+<!-- HERO -->
+<section class="hero">
+  <div class="glow"></div>
+  <div class="wrap" style="position: relative; z-index: 1;">
+    <div class="eyebrow">Built for <span data-company>your team</span></div>
+    <h1>
+      <span class="name" data-name>there</span>, here's how
+      <span class="company" data-company>your company</span> can stop losing money to missed calls - without hiring a receptionist.
+    </h1>
+    <p class="sub">
+      After-hours calls. Weekend emergencies. The leads that ring twice and hang up. Right now <span data-company>your company</span> is paying for every one of them in lost jobs. Watch this 3-min walkthrough - you'll see the exact AI receptionist that picks up every call, books the appointment, and texts you a summary. Works 24/7 for less than a part-time hire.
+    </p>
+    <div class="video">
+      <!-- SWAP: replace the placeholder div with the real Loom embed iframe below -->
+      <!-- <iframe src="https://www.loom.com/embed/REPLACE_WITH_LOOM_VIDEO_ID" frameborder="0" allowfullscreen></iframe> -->
+      <div class="placeholder">
+        <div class="play"></div>
+        <div style="font-size:14px;">Loom walkthrough - swap embed here</div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- COST MATH -->
+<section>
+  <div class="wrap">
+    <h2>Every missed call is a paying customer your competitor gets.</h2>
+    <p class="lead">
+      Service businesses miss roughly 27% of inbound calls. After 5pm, weekends, holidays - the phone keeps ringing but nobody's picking up. Most of those callers don't leave a voicemail. They call the next name on Google.
+    </p>
+    <div class="compare">
+      <div class="col bad">
+        <h3>Missing calls every day</h3>
+        <div class="big">~$5,000/mo lost</div>
+        <ul>
+          <li><span class="mark">×</span><span><strong>27% of inbound calls</strong> go unanswered (industry avg)</span></li>
+          <li><span class="mark">×</span><span><strong>After 5pm &amp; weekends</strong> = closed for business</span></li>
+          <li><span class="mark">×</span><span><strong>Voicemails get ignored</strong> by callers, not returned</span></li>
+          <li><span class="mark">×</span><span>No record of who called, when, or why</span></li>
+          <li><span class="mark">×</span><span>Every missed lead = competitor's customer</span></li>
+        </ul>
+        <div class="footnote">Source: small business call studies. At $400 avg job × 12 missed leads/mo = $4,800+ lost monthly.</div>
+      </div>
+      <div class="col good">
+        <h3>The Phone Vault</h3>
+        <div class="big">$2,500 once + $297/mo</div>
+        <ul>
+          <li><span class="mark">✓</span><span><strong>24/7 pickup</strong> - every call, every hour, every day</span></li>
+          <li><span class="mark">✓</span><span><strong>Trained on your business</strong> - services, pricing, tone</span></li>
+          <li><span class="mark">✓</span><span><strong>Books appointments</strong> directly into your existing calendar</span></li>
+          <li><span class="mark">✓</span><span><strong>10-day install</strong>, real-time SMS summaries, never sleeps</span></li>
+          <li><span class="mark">✓</span><span><strong>Guarantee:</strong> 10+ qualified leads in 30 days or no charge month 2</span></li>
+        </ul>
+        <div class="footnote">Standard pricing. Annual: $5,500/yr (save $464).</div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- WHAT'S INSIDE -->
+<section>
+  <div class="wrap">
+    <h2>What gets installed at <span class="accent" data-company>your company</span>.</h2>
+    <p class="lead">
+      Three jobs your phone is supposed to do but doesn't. One AI receptionist that does all three on day one.
+    </p>
+    <div class="grid3">
+      <div class="feat">
+        <div class="ico">1</div>
+        <h4>24/7 Pickup</h4>
+        <p>Every after-hours call, weekend ring, and holiday emergency picked up within 2 rings. Trained on your services, your pricing, your tone.</p>
+      </div>
+      <div class="feat">
+        <div class="ico">2</div>
+        <h4>Auto-Booking</h4>
+        <p>Books appointments directly into your existing calendar (Google, Outlook, Calendly). Captures name, number, service needed, urgency.</p>
+      </div>
+      <div class="feat">
+        <div class="ico">3</div>
+        <h4>Real-Time SMS</h4>
+        <p>Every call summary lands on your phone within 60 seconds. Caller, reason, urgency, action required. No more guessing what voicemails said.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- DOWNLOAD -->
+<section>
+  <div class="wrap">
+    <div class="download">
+      <div class="meta">
+        <div class="label">Free - yours to keep</div>
+        <h3>The Missed Call Killer skill</h3>
+        <p>The free Claude skill that gives <span data-company>your company</span> a working AI receptionist on one phone line. Drop it into Claude and start catching calls in 5 minutes. No strings, no opt-in, no upsell required.</p>
+      </div>
+      <!-- SWAP: replace href with the real skill file URL or local file path -->
+      <a class="btn" href="#" download>Download the free skill →</a>
+    </div>
+  </div>
+</section>
+<!-- CTA -->
+<section class="cta">
+  <div class="glow"></div>
+  <div class="wrap inner">
+    <h2>Want The Phone Vault installed at <span class="accent" data-company>your company</span>?</h2>
+    <p class="lead">
+      Live on your main business number in 10 days. AI receptionist trained on your business, integrated with your calendar, a summary text to your phone for every call. <strong>$2,500 setup + $297/mo.</strong> Guaranteed to catch 10+ qualified leads in 30 days or you don't pay for month two. Reply with one word - <span class="kbd">PLUG</span> - and I'll send the 10-min scoping form.
+    </p>
+    <div class="cta-actions">
+      <a class="btn" href="mailto:admin@buildsimplefast.com?subject=PLUG%20-%20Phone%20Vault%20scoping&body=Hey%20-%20PLUG.%20Send%20the%20scoping%20form.">Reply PLUG to start</a>
+      <a class="btn ghost" href="mailto:admin@buildsimplefast.com">Or email me directly</a>
+    </div>
+    <div class="reply-hint">
+      Replies go to <strong>admin@buildsimplefast.com</strong>. One word is enough.
+    </div>
+  </div>
+</section>
+<!-- FOOTER -->
+<footer class="site">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>BuildSimpleFast · Automated Operator</div>
+    <div>Built for <span data-company>your team</span> · <a href="mailto:admin@buildsimplefast.com">admin@buildsimplefast.com</a></div>
+  </div>
+</footer>
+<script>
+  // URL-param personalization. Use ?n=FirstName&c=CompanyName
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const rawName = (params.get('n') || params.get('name') || '').trim();
+    const rawCompany = (params.get('c') || params.get('company') || '').trim();
+    function cleanName(s) {
+      if (!s) return '';
+      // Capitalize first letter of each word, conservative
+      return s.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+    function cleanCompany(s) {
+      if (!s) return '';
+      // Preserve casing as provided; just trim and decode
+      return s.replace(/\+/g, ' ');
+    }
+    const name = cleanName(rawName) || 'there';
+    const company = cleanCompany(rawCompany) || 'your company';
+    document.querySelectorAll('[data-name]').forEach(el => { el.textContent = name; });
+    document.querySelectorAll('[data-company]').forEach(el => { el.textContent = company; });
+    // Update title for browser tab + share previews
+    if (rawCompany) {
+      document.title = company + ' - Never miss another call | Automated Operator';
+    }
+  })();
+</script>
+</body>
+</html>
